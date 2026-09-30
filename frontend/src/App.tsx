@@ -3,7 +3,7 @@ import {
   Search, Plus, Image as ImageIcon, Camera, FileText, FolderOpen, Mic,
   Send, Volume2, Square, Leaf, CloudSun, MapPin, Wifi, X, Languages,
   MoreHorizontal, CalendarClock, PlugZap, FolderKanban, Code2, LibraryBig,
-  Paperclip, Menu, Sun, Moon, Video, StopCircle
+  Paperclip, Menu, Sun, Moon, Video
 } from "lucide-react";
 import "./App.css";
 
@@ -21,7 +21,6 @@ const API = "http://127.0.0.1:8000";
 
 function App() {
   const [location, setLocation] = useState("Tap to detect location");
-  const [weather, setWeather] = useState("");
   const [language, setLanguage] = useState("ta-IN");
   const [chats, setChats] = useState<Chat[]>([]);
   const [currentChatId, setCurrentChatId] = useState<string | null>(null);
@@ -194,11 +193,6 @@ function App() {
     return !q || chat.title.toLowerCase().includes(q) || chat.messages.some(m => m.text.toLowerCase().includes(q));
   });
 
-  const updateCurrentChat = (updater: (chat: Chat) => Chat) => {
-    if (!currentChatId) return;
-    setChats(prev => prev.map(chat => chat.id === currentChatId ? updater(chat) : chat));
-  };
-
   const askAgriN = async (text: string, imageData?: string | null, fileName?: string, voice = false) => {
     const trimmed = text.trim();
     if (!trimmed && !imageData && !fileName) return;
@@ -284,10 +278,6 @@ function App() {
     navigator.geolocation.getCurrentPosition(position => {
       const { latitude, longitude } = position.coords;
       setLocation(`${latitude.toFixed(4)}, ${longitude.toFixed(4)}`);
-      setWeather("Loading...");
-      fetch(`https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,relative_humidity_2m,weather_code&timezone=auto`)
-        .then(r => r.json()).then(data => setWeather(`${data.current.temperature_2m}°C · Humidity ${data.current.relative_humidity_2m}%`))
-        .catch(() => setWeather("Weather unavailable"));
     }, () => setLocation("Location permission denied"));
   };
 
